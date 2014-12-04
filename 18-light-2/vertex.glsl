@@ -30,7 +30,7 @@ void main() {
   // parallelDistanceVal = parallelDistance(vec3(position.xyz), vec3(inverseSurfaceNormal.xyz), vec3(position.xyz));
   lambertWeightVal = lambertWeight(vec3(normal.xyz), normalize(lightDirection));
 
-  reflectedLightVec = reflectedLight(vec3(normal.xyz), normalize(lightDirection), ambient, diffuse);
+  reflectedLightVec = reflectedLight(vec3(inverseSurfaceNormal.xyz), normalize(lightDirection), ambient, diffuse);
 
 
   gl_Position = (projection * model * view) * position;
