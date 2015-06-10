@@ -1,39 +1,47 @@
-precision highp float;
+precision mediump float;
 
-attribute vec4 position, normal;
-uniform mat4 model, view, projection;
-uniform mat4 inverseModel, inverseView, inverseProjection;
-uniform vec3 ambient, diffuse, lightDirection;
+attribute vec3 position;
+attribute vec3 normal;
 
-varying vec3 reflectedLightVec;
-varying float lambertWeightVal;
-varying vec4 inverseSurfaceNormal;
-varying vec4 p;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
-vec3 reflectedLight(vec3 normal, vec3 lightDirection, vec3 ambient, vec3 diffuse) {
-  float brightness = dot(normal, lightDirection);
-  return ambient + diffuse * max(brightness, 0.0);
-}
+uniform mat4 inverseModel;
+uniform mat4 inverseView;
+uniform mat4 inverseProjection;
 
-float lambertWeight(vec3 n, vec3 d) {
-  return max(dot(n, d), 0.0);
-}
+uniform vec3 ambient;
+uniform vec3 diffuse;
+uniform vec3 lightDirection;
 
-float parallelDistance(vec3 surfacePoint, vec3 surfaceNormal, vec3 p) {
-  return dot(p - surfacePoint, surfaceNormal);
+varying vec3 vColor;
+
+// transpose() doesn't exist in shader-school's glsl :( Implement manually
+// http://stackoverflow.com/a/18038495/1299302
+mat4 transpose(in mat4 inMatrix) {
+   vec4 i0 = inMatrix[0];
+   vec4 i1 = inMatrix[1];
+   vec4 i2 = inMatrix[2];
+   vec4 i3 = inMatrix[3];
+
+   mat4 outMatrix = mat4(
+                   vec4(i0.x, i1.x, i2.x, i3.x),
+                   vec4(i0.y, i1.y, i2.y, i3.y),
+                   vec4(i0.z, i1.z, i2.z, i3.z),
+                   vec4(i0.w, i1.w, i2.w, i3.w)
+                   );
+  return outMatrix;
 }
 
 void main() {
-  vec4 inverseSurfacePos = (inverseProjection * inverseModel * inverseView) * position;
-  inverseSurfaceNormal = (inverseModel) * normal;
-  p = position;
-  // parallelDistanceVal = parallelDistance(vec3(position.xyz), vec3(inverseSurfaceNormal.xyz), vec3(position.xyz));
-  lambertWeightVal = lambertWeight(vec3(normal.xyz), normalize(lightDirection));
+  gl_Position = projection * view * model * vec4(position, 1.0);
 
-  reflectedLightVec = reflectedLight(vec3(inverseSurfaceNormal.xyz), normalize(lightDirection), ambient, diffuse);
+  // See https://www.cs.uaf.edu/2007/spring/cs481/lecture/01_23_matrices.html, "Normal Matrix"
+  mat3 normalMatrix = mat3(transpose(inverseModel * inverseView));
+  // Adjust normal into eye space
+  vec3 viewNormal = normalMatrix * normal;
 
-
-  gl_Position = (projection * model * view) * position;
-
+  float brightness = dot(viewNormal, lightDirection);
+  vColor = ambient + diffuse * max(brightness, 0.0);
 }
-
