@@ -43,5 +43,5 @@ void main() {
   vec3 viewNormal = normalMatrix * normal;
 
   float brightness = dot(viewNormal, lightDirection);
-  vColor = diffuse * max(brightness, 0.0);
+  vColor = ambient + diffuse * max(brightness, 0.0);
 }
