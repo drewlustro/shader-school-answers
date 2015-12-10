@@ -7,8 +7,6 @@ uniform mat4 inverseModel, inverseView, inverseProjection;
 uniform vec3 ambient, diffuse, specular, lightPosition;
 uniform float shininess;
 
-varying vec3 lightDirection;
-
 varying vec4 viewPosition;
 varying vec3 vEyeDirection;
 varying vec3 vNormal;
@@ -25,9 +23,9 @@ void main() {
   vEyeDirection = normalize(viewPosition.xyz);
 
   // calculate the lightDirection
-  vec4 modelPos = model * position;
-  vec4 modelLightPos = model * vec4(lightPosition, 1.0);
+  // vec4 modelPos = model * position;
+  // vec4 modelLightPos = model * vec4(lightPosition, 1.0);
   //vec4 surfacePos = position * inverseModel * inverseView;
   //vec4 lightPos = view * model * vec4(lightPosition, 1.0);
-  lightDirection = (modelLightPos - modelPos).xyz;
+  // lightDirection = (modelLightPos - modelPos).xyz;
 }
